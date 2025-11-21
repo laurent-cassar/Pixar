@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packet Runner - Présentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .slides-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            padding: 60px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 1000;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: #00ffff;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #00ff88;
+            transform: scale(1.05);
+        }
+
+        .nav-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        /* Slide counter */
+        .slide-counter {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            color: #666;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        /* Titre principal */
+        h1 {
+            font-size: 72px;
+            margin-bottom: 30px;
+            color: #00ffff;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        h2 {
+            font-size: 48px;
+            margin-bottom: 40px;
+            color: #00ff88;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #ffaa00;
+        }
+
+        p, li {
+            font-size: 24px;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        /* Grille */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* Illustrations */
+        .illustration {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        /* Routeurs illustration */
+        .router-demo {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .router-box {
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            min-width: 200px;
+        }
+
+        .router-box.optimized {
+            background: rgba(0, 255, 136, 0.2);
+            border: 3px solid #00ff88;
+        }
+
+        .router-box.standard {
+            background: rgba(100, 100, 100, 0.2);
+            border: 3px solid #666;
+        }
+
+        .router-box.overloaded {
+            background: rgba(255, 51, 68, 0.2);
+            border: 3px solid #ff3344;
+        }
+
+        .router-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 10px;
+        }
+
+        .router-box.optimized .router-icon {
+            background: #00ff88;
+        }
+
+        .router-box.standard .router-icon {
+            background: #666;
+        }
+
+        .router-box.overloaded .router-icon {
+            background: #ff3344;
+        }
+
+        .router-stats {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        /* Resources bars */
+        .resources-demo {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .resource-bar {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .bar-label {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 30px;
+            background: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 2s ease;
+        }
+
+        .bar-fill.ttl {
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+        }
+
+        .bar-fill.latency {
+            background: linear-gradient(90deg, #ffaa00, #ff8800);
+        }
+
+        .bar-fill.energy {
+            background: linear-gradient(90deg, #ff3344, #cc0022);
+        }
+
+        /* Stats box */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .stat-box {
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #333;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #00ffff;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 20px;
+            color: #888;
+        }
+
+        /* Level design preview */
+        .level-preview {
+            position: relative;
+            height: 400px;
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 40px 0;
+        }
+
+        .network-path {
+            position: absolute;
+            width: 120px;
+            height: 40px;
+            border-radius: 5px;
+        }
+
+        .player-cube {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: #00ffff;
+            border-radius: 5px;
+            left: 50px;
+            top: 180px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Liste avec puces personnalisées */
+        ul {
+            list-style: none;
+            padding-left: 40px;
+        }
+
+        ul li::before {
+            content: "▸";
+            color: #00ffff;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 5px solid #00ffff;
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+
+        /* Impact chart */
+        .impact-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 40px;
+            height: 300px;
+            margin: 40px 0;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, #00ff88, #00ffff);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -40px;
+            font-size: 16px;
+            white-space: nowrap;
+        }
+
+        .chart-value {
+            color: #000;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* Green IT logo */
+        .green-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #00ff88, #00ffff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 30px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Two columns layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin: 40px 0;
+        }
+
+        .column {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">12</span>
+    </div>
+
+    <div class="slides-container">
+        <!-- SLIDE 1: Titre -->
+        <div class="slide active">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <div class="green-logo">🌱</div>
+                <h1>PACKET RUNNER</h1>
+                <p class="subtitle">L'Odyssée d'un Paquet Réseau</p>
+                <p class="subtitle" style="font-size: 20px; margin-top: 50px;">
+                    GREEN IT GAME Challenge - Unity 6.X
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: Le Concept -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>💡 Le Concept</h2>
+                <div class="highlight-box">
+                    <p style="font-size: 28px; text-align: center;">
+                        "De votre clic à la destination : <strong style="color: #00ffff;">15 routeurs</strong>, 
+                        <strong style="color: #ffaa00;">12 000 km</strong>, 
+                        <strong style="color: #ff3344;">0.2g de CO2</strong>"
+                    </p>
+                </div>
+                <p style="font-size: 26px; text-align: center; margin-top: 40px;">
+                    Un jeu de plateforme 2D où le joueur incarne un <strong style="color: #00ffff;">paquet de données</strong>
+                    qui traverse l'infrastructure Internet invisible.
+                </p>
+                <p style="font-size: 22px; text-align: center; margin-top: 30px; color: #888;">
+                    Matérialiser l'impact environnemental du routage réseau
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Les 3 Ressources -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>📊 Les 3 Ressources à Gérer</h2>
+                <div class="resources-demo">
+                    <div class="resource-bar">
+                        <div class="bar-label" style="color: #00ff88;">⚡ TTL (Time To Live)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill ttl" style="width: 75%;"></div>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 18px;">Nombre de sauts réseau restants (64 → 0)</p>
+                    </div>
+                    <div class="resource-bar">
+                        <div class="bar-label" style="color: #ffaa00;">⏱️ Latence (Ping)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill latency" style="width: 40%;"></div>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 18px;">Délai accumulé en millisecondes (0 → 500ms)</p>
+                    </div>
+                    <div class="resource-bar">
+                        <div class="bar-label" style="color: #ff3344;">🔥 Énergie (Watts)</div>
+                        <div class="bar-container">
+                            <div class="bar-fill energy" style="width: 60%;"></div>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 18px;">Consommation électrique = CO2 (0W → ∞)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Les Types de Routeurs -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🌐 Les Types de Routeurs</h2>
+                <div class="router-demo">
+                    <div class="router-box optimized">
+                        <div class="router-icon"></div>
+                        <h3 style="color: #00ff88; font-size: 24px;">Optimisé</h3>
+                        <div class="router-stats">
+                            <p>Latence: +2ms</p>
+                            <p>Énergie: +0.5W</p>
+                            <p style="color: #00ff88; font-weight: bold;">🌱 Green</p>
+                        </div>
+                    </div>
+                    <div class="router-box standard">
+                        <div class="router-icon"></div>
+                        <h3 style="color: #999; font-size: 24px;">Standard</h3>
+                        <div class="router-stats">
+                            <p>Latence: +10ms</p>
+                            <p>Énergie: +2W</p>
+                            <p style="color: #999; font-weight: bold;">⚖️ Équilibré</p>
+                        </div>
+                    </div>
+                    <div class="router-box overloaded">
+                        <div class="router-icon"></div>
+                        <h3 style="color: #ff3344; font-size: 24px;">Surchargé</h3>
+                        <div class="router-stats">
+                            <p>Latence: +50ms</p>
+                            <p>Énergie: +3W</p>
+                            <p style="color: #ff3344; font-weight: bold;">❌ Polluant</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Le Gameplay -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🎮 Le Gameplay</h2>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Mécaniques</h3>
+                        <ul>
+                            <li>Plateforme 2D simple</li>
+                            <li>Sauts entre routeurs</li>
+                            <li>Choix de routes</li>
+                            <li>Gestion en temps réel</li>
+                        </ul>
+                        <div class="highlight-box" style="margin-top: 30px;">
+                            <p><strong>Trade-off central :</strong></p>
+                            <p>Rapidité 🆚 Écologie</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>3 Chemins Possibles</h3>
+                        <div style="margin-top: 20px;">
+                            <p style="color: #ff3344;">🔴 Bas : Facile mais polluant</p>
+                            <p style="margin-left: 30px; font-size: 18px;">4 routeurs surchargés</p>
+                            
+                            <p style="color: #999; margin-top: 20px;">⚪ Milieu : Équilibré</p>
+                            <p style="margin-left: 30px; font-size: 18px;">4 routeurs standards</p>
+                            
+                            <p style="color: #00ff88; margin-top: 20px;">🟢 Haut : Difficile mais green</p>
+                            <p style="margin-left: 30px; font-size: 18px;">4 routeurs optimisés</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Direction Artistique -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🎨 Direction Artistique</h2>
+                <h3 style="text-align: center; color: #00ffff; margin-bottom: 40px;">Minimalisme Cyber</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number" style="color: #00ffff;">0 Ko</div>
+                        <div class="stat-label">Textures Externes</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color: #00ff88;">100%</div>
+                        <div class="stat-label">Aplats de Couleur</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color: #ffaa00;">~25 Mo</div>
+                        <div class="stat-label">Taille Build</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" style="color: #ff3344;">< 20</div>
+                        <div class="stat-label">Draw Calls</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p style="text-align: center; font-size: 22px;">
+                        <strong>Le jeu prêche par l'exemple</strong><br>
+                        Forme sobre pour un fond sur la sobriété
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: Matérialiser l'Invisible -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>👁️ Matérialiser l'Invisible</h2>
+                <div style="margin-top: 60px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 40px;">
+                        <div style="width: 60px; height: 60px; background: #00ff88; border-radius: 50%; margin-right: 30px;"></div>
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0;">TTL → Mécanique de jeu</h3>
+                            <p style="margin: 10px 0; font-size: 20px;">Concept réseau transformé en ressource vitale</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 40px;">
+                        <div style="width: 60px; height: 60px; background: #ffaa00; border-radius: 50%; margin-right: 30px;"></div>
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0;">Latence → Ressenti physique</h3>
+                            <p style="margin: 10px 0; font-size: 20px;">Le "ping" devient un ralentissement du joueur</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; margin-bottom: 40px;">
+                        <div style="width: 60px; height: 60px; background: #ff3344; border-radius: 50%; margin-right: 30px;"></div>
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0;">Data Centers → Impact visible</h3>
+                            <p style="margin: 10px 0; font-size: 20px;">Chaque routeur = consommation électrique réelle</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Pédagogie Intégrée -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🎓 Pédagogie Intégrée</h2>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Pendant le Jeu</h3>
+                        <ul style="font-size: 20px;">
+                            <li>Briefing : Paris → Tokyo</li>
+                            <li>Routeurs = vraies technologies</li>
+                            <li>TTL = concept réseau réel</li>
+                            <li>Feedback immédiat</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Écran de Victoire</h3>
+                        <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; font-size: 18px;">
+                            <p>Hops : 12/64</p>
+                            <p>Latence : 142ms</p>
+                            <p>Énergie : 28W</p>
+                            <p style="margin-top: 20px; color: #00ff88;"><strong>CO2 : 0.18g</strong></p>
+                            <p style="color: #00ff88;"><strong>Grade : A (Green)</strong></p>
+                            <p style="margin-top: 20px; color: #888;">vs Route standard : 0.25g</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Impact Écologique -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🌍 Impact Écologique Réel</h2>
+                <div class="impact-chart">
+                    <div class="chart-bar" style="height: 80%;">
+                        <div class="chart-value">0.18g</div>
+                        <div class="chart-label">Votre Route<br>(Optimisée)</div>
+                    </div>
+                    <div class="chart-bar" style="height: 100%; background: linear-gradient(to top, #ffaa00, #ff8800);">
+                        <div class="chart-value">0.25g</div>
+                        <div class="chart-label">Route<br>Standard</div>
+                    </div>
+                    <div class="chart-bar" style="height: 150%; background: linear-gradient(to top, #ff3344, #cc0022);">
+                        <div class="chart-value">0.45g</div>
+                        <div class="chart-label">Route Non-<br>Optimisée</div>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 60px;">
+                    <p style="text-align: center; font-size: 24px;">
+                        <strong>Si tous les paquets du web étaient routés comme les vôtres :</strong><br><br>
+                        <span style="color: #00ff88; font-size: 32px;">-2.1 millions de tonnes CO2/an</span><br>
+                        <span style="font-size: 20px;">Équivalent à 450 000 voitures en moins</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Architecture Modulaire -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🏗️ Architecture Modulaire</h2>
+                <div style="margin-top: 40px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; border: 2px solid #00ffff;">
+                            <h3 style="font-size: 22px; color: #00ffff;">Core</h3>
+                            <p style="font-size: 16px;">GameManager</p>
+                            <p style="font-size: 16px;">ResourceManager</p>
+                        </div>
+                        <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; border: 2px solid #00ff88;">
+                            <h3 style="font-size: 22px; color: #00ff88;">Player</h3>
+                            <p style="font-size: 16px;">PlayerController</p>
+                        </div>
+                        <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; border: 2px solid #ffaa00;">
+                            <h3 style="font-size: 22px; color: #ffaa00;">Level</h3>
+                            <p style="font-size: 16px;">LevelGenerator</p>
+                            <p style="font-size: 16px;">RouterNode</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr; gap: 20px;">
+                        <div style="background: #1a1a1a; padding: 20px; border-radius: 10px; border: 2px solid #ff3344;">
+                            <h3 style="font-size: 22px; color: #ff3344;">UI (5 scripts)</h3>
+                            <p style="font-size: 16px;">UIManager • MenuUI • GameplayUI • VictoryUI • GameOverUI</p>
+                        </div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 40px; font-size: 20px; color: #888;">
+                    11 fichiers modulaires • ~950 lignes • Maintenable • Scalable
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: Évolutions Futures -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <h2>🚀 Pistes d'Évolution</h2>
+                <div class="two-columns">
+                    <div class="column">
+                        <h3>Court Terme</h3>
+                        <ul style="font-size: 20px;">
+                            <li>5 niveaux progressifs</li>
+                            <li>Nouveaux routeurs (CDN, Legacy)</li>
+                            <li>Système de sauvegarde</li>
+                            <li>Particules et effets</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h3>Moyen/Long Terme</h3>
+                        <ul style="font-size: 20px;">
+                            <li>Générateur procédural</li>
+                            <li>Mode Sandbox (créer son réseau)</li>
+                            <li>Protocoles de routage (BGP, OSPF)</li>
+                            <li>Narration (ingénieur GreenNet)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 40px;">
+                    <p style="text-align: center; font-size: 22px;">
+                        <strong>Vision :</strong> Outil pédagogique pour formations Green IT
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Conclusion -->
+        <div class="slide">
+            <div class="grid-bg"></div>
+            <div class="content">
+                <div class="green-logo">♻️</div>
+                <h2>Sobriété ≠ Simplicité</h2>
+                <h3 style="text-align: center; color: #888; font-size: 28px; margin-bottom: 60px;">
+                    C'est l'intelligence de la contrainte
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Ressources Gérées</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">0 Ko</div>
+                        <div class="stat-label">Assets Externes</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">11</div>
+                        <div class="stat-label">Scripts Modulaires</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">2-5min</div>
+                        <div class="stat-label">Durée d'une Partie</div>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 60px;">
+                    <p style="text-align: center; font-size: 28px;">
+                        <strong style="color: #00ffff;">Prouver que l'innovation</strong><br>
+                        <strong style="color: #00ff88;">ne s'oppose pas à la sobriété</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">◀ Précédent</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Suivant ▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+
+            // Trigger animations on resource bars (slide 3)
+            if (currentSlide === 2) {
+                setTimeout(() => {
+                    document.querySelectorAll('.bar-fill').forEach(bar => {
+                        bar.style.width = bar.style.width;
+                    });
+                }, 100);
+            }
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                changeSlide(-1);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                showSlide(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                showSlide(totalSlides - 1);
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
